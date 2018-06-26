@@ -11,6 +11,8 @@
 
 namespace Framework\Handles;
 
+use Framework\Exceptions\HttpException;
+
 /**
  * Class ErrorHandel
  *
@@ -50,7 +52,7 @@ class ErrorHandle implements Handle {
       'line'    => $error['line'],
     ];
 
-     throw new \Exception(json_encode($errorInfo), 500);
+     HttpException::response($errorInfo);
   }
 
   public function errorHandler($errorNumber, $errorMessage, $errorFile, $errorLine, $errorContext)
@@ -62,6 +64,6 @@ class ErrorHandle implements Handle {
       'line'    => $errorLine,
       'context' => $errorContext,
     ];
-     throw new \Exception(json_encode($errorInfo), 500);
+     HttpException::response($errorInfo);
   }
 }

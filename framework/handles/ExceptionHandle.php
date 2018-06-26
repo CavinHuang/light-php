@@ -22,7 +22,21 @@ namespace Framework\Handles;
  */
 class ExceptionHandle implements Handle {
 
-  public function register () {
-    // TODO: Implement register() method.
+  public function register()
+  {
+    set_exception_handler([$this, 'exceptionHandler']);
+  }
+
+  public function exceptionHandler($exception)
+  {
+    $exceptionInfo = [
+      'number'  => $exception->getCode(),
+      'message' => $exception->getMessage(),
+      'file'    => $exception->getFile(),
+      'line'    => $exception->getLine(),
+      'trace'   => $exception->getTrace(),
+    ];
+
+    throw new \Exception(json_encode($exceptionInfo), 500);
   }
 }

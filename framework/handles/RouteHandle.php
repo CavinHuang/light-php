@@ -11,6 +11,8 @@
 
 namespace Framework\Handles;
 
+use Framework\Exceptions\HttpException;
+
 /**
  * Class RouteHandel
  *
@@ -40,22 +42,47 @@ class RouteHandle implements Handle {
     preg_match_all('/^\/(.*)\?/', $_SERVER['REQUEST_URI'], $uri);
     $uri = $uri[1][0];
     if (empty($uri)) {
-      throw new \Exception('NOT FOUND', 404);
+      throw new HttpException(404);
     }
     $uri = explode('/', $uri);
-    if (count($uri) !== 3) {
-      throw new \Exception('BAD REQUEST', 400);
+
+    switch (count($uri)) {
+      case 3:
+        /**
+         * 默认模块/控制器/操作逻辑
+         */
+        $moduleName     = $uri['0'];
+        $controllerName = $uri['1'];
+        $actionName     = $uri['2'];
+        break;
+
+      case 2:
+        /**
+         * 默认模块
+         */
+
+        break;
+      case 1:
+        /**
+         * 默认模块/控制器
+         */
+
+        break;
+
+      default:
+        /**
+         * 默认模块/控制器/操作逻辑
+         */
+        break;
     }
-    $moduleName = $uri['0'];
-    $controllerName = $uri['1'];
-    $actionName = $uri['2'];
+
 
     $controllerPath = 'App\\' . $moduleName . '\\Controllers\\' . $controllerName;
 
     $reflaction = new \ReflectionClass($controllerPath);
 
     if(!$reflaction->hasMethod($actionName)) {
-      throw new \Exception('ACTION NOT FOUND', 404);
+      throw new HttpException(404, 'Action:' . $actionName);
     }
     $controller = new $controllerPath();
     $controller->$actionName();

@@ -12,6 +12,7 @@
 use Framework\Handles\ErrorHandle;
 use Framework\Handles\ExceptionHandle;
 use Framework\Handles\RouteHandle;
+use Framework\Exceptions\HttpException;
 
 define('ROOT_PATH', dirname($_SERVER['SCRIPT_FILENAME']) . '/..');
 
@@ -20,7 +21,7 @@ require(ROOT_PATH . '/framework/App.php');
 
 
 try {
-  new Loader();
+  Loader::register();
 
   $app = new App();
 
@@ -35,6 +36,6 @@ try {
   $app->load(function(){
     return new RouteHandle();
   });
-} catch (\Exception $e) {
-  var_dump($e);
+} catch (HttpException $e) {
+  HttpException::response($e);
 }
