@@ -27,6 +27,13 @@ class RouteHandle implements Handle {
     $this->route();
   }
 
+  /**
+   * 路由映射
+   * @throws \Exception
+   * @author cavinHUang
+   * @date   2018/6/26 0026 下午 5:03
+   *
+   */
   public function route()
   {
 
@@ -44,6 +51,12 @@ class RouteHandle implements Handle {
     $actionName = $uri['2'];
 
     $controllerPath = 'App\\' . $moduleName . '\\Controllers\\' . $controllerName;
+
+    $reflaction = new \ReflectionClass($controllerPath);
+
+    if(!$reflaction->hasMethod($actionName)) {
+      throw new \Exception('ACTION NOT FOUND', 404);
+    }
     $controller = new $controllerPath();
     $controller->$actionName();
   }
