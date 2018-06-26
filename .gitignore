@@ -5,6 +5,7 @@
 
 /vendor/
 /node_modules/
+/easy-php/
 package.json
 package-lock.json
 

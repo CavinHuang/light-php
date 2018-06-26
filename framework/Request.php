@@ -9,6 +9,9 @@
  *                                               *
  *************************************************/
 
-// 载入框架运行文件
-require(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'framework/run.php');
+namespace Framework;
 
+
+class Request {
+
+}

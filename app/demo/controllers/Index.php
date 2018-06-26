@@ -15,6 +15,6 @@ class Index {
 
   public function index () {
 
-    return 1;
+    echo 1;
   }
 }

@@ -9,6 +9,16 @@
  *                                               *
  *************************************************/
 
-// 载入框架运行文件
-require(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'framework/run.php');
+namespace Framework\Handles;
 
+interface Handle
+{
+  /**
+   * 注册接口
+   * @return mixed
+   * @author cavinHUang
+   * @date   2018/6/26 0026 下午 4:03
+   *
+   */
+  public function register ();
+}

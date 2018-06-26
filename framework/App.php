@@ -9,6 +9,27 @@
  *                                               *
  *************************************************/
 
-// 载入框架运行文件
-require(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'framework/run.php');
+// namespace Framework;
 
+/**
+ * Class App
+ *
+ * 框架自身应用
+ *
+ * @package Framework
+ * @VERSION
+ * @AUTHOR  cavinHuang
+ */
+class App {
+
+  /**
+   * 用于加载各种方法
+   * @author cavinHUang
+   * @date   2018/6/26 0026 下午 4:12
+   *
+   */
+  public function load($handle)
+  {
+    $handle()->register();
+  }
+}

@@ -9,6 +9,20 @@
  *                                               *
  *************************************************/
 
-// 载入框架运行文件
-require(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'framework/run.php');
+namespace Framework\Handles;
 
+/**
+ * Class ExceptionHandel
+ *
+ * 异常处理类
+ *
+ * @package Framework\Handles
+ * @VERSION
+ * @AUTHOR  cavinHuang
+ */
+class ExceptionHandle implements Handle {
+
+  public function register () {
+    // TODO: Implement register() method.
+  }
+}
