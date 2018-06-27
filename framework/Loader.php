@@ -11,6 +11,7 @@
 
 // namespace Framework;
 
+use Framework\Exceptions\HttpException;
 
 class Loader {
 
@@ -27,12 +28,12 @@ class Loader {
   }
 
   /**
-   *
    * 自定义自动加载类
-   *
    * @param $class
    * @author cavinHUang
    * @date   2018/6/26 0026 下午 4:15
+   * @throws \Framework\Exceptions\HttpException
+   * @throws \Exception
    */
   public static function autoLoad ($class) {
 
@@ -47,7 +48,7 @@ class Loader {
     $class       = implode('\\', $classInfo);
     $classPath   = ROOT_PATH.'/'.str_replace('\\', '/', $class).'.php';
     if (!file_exists($classPath)) {
-      throw new \Exception("$classPath Not Found", 404);
+      throw new HttpException(404, "$classPath Not Found");
     }
     self::$map[$classOrigin] = $classPath;
     require $classPath;

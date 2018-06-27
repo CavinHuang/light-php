@@ -50,13 +50,13 @@ class HttpException extends \Exception {
 
     $this->code = $code;
 
-    if (!isset($this->_httpCode[$code])) throw new Exception($this->_httpCode[404], 404);
+    if (!isset($this->_httpCode[$code])) throw new \Exception($this->_httpCode[404], 404);
 
-    if (empty($extra)) {
+    if (empty($message)) {
       $this->message = $this->_httpCode[$code];
       return;
     }
-    $this->message = $extra . ' ' . $this->_httpCode[$code];
+    $this->message = $message . ' ' . $this->_httpCode[$code];
   }
 
   /**
@@ -69,7 +69,7 @@ class HttpException extends \Exception {
    */
   public static function response ($exception) {
 //    header('Content-Type:Application/json; Charset=utf-8');
-    if ($exception instanceof Excption) {
+    if ($exception instanceof HttpException) {
       die(json_encode([
         'coreError' => [
           'code'    => $exception->getCode(),

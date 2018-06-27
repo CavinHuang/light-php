@@ -82,7 +82,7 @@ class RouteHandle implements Handle {
     $reflaction = new \ReflectionClass($controllerPath);
 
     if(!$reflaction->hasMethod($actionName)) {
-      throw new HttpException(404, 'Action:' . $actionName);
+      throw new HttpException(404, 'Action:' . $actionName .' In '. $controllerName . 'Controller');
     }
     $controller = new $controllerPath();
     $controller->$actionName();
