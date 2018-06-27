@@ -142,8 +142,6 @@ class RouteHandle implements Handle {
    */
   public function route()
   {
-    var_dump($this->actionName);
-
     // 路由策略
     $strategy = $this->routeStrategy;
     $this->$strategy();
