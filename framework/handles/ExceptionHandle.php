@@ -10,6 +10,7 @@
  *************************************************/
 
 namespace Framework\Handles;
+use Framework\App;
 
 /**
  * Class ExceptionHandel
@@ -22,21 +23,21 @@ namespace Framework\Handles;
  */
 class ExceptionHandle implements Handle {
 
-  public function register()
+  /**
+   * 构造函数
+   */
+  public function __construct()
+  {
+    # code...
+  }
+
+  public function register(App $app)
   {
     set_exception_handler([$this, 'exceptionHandler']);
   }
 
   public function exceptionHandler($exception)
   {
-    $exceptionInfo = [
-      'number'  => $exception->getCode(),
-      'message' => $exception->getMessage(),
-      'file'    => $exception->getFile(),
-      'line'    => $exception->getLine(),
-      'trace'   => $exception->getTrace(),
-    ];
-
-    throw new \Exception(json_encode($exceptionInfo), 500);
+    throw $exception;
   }
 }

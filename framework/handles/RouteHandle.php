@@ -12,6 +12,7 @@
 namespace Framework\Handles;
 
 use Framework\Exceptions\HttpException;
+use Framework\App;
 
 /**
  * Class RouteHandel
@@ -24,8 +25,58 @@ use Framework\Exceptions\HttpException;
  */
 class RouteHandle implements Handle {
 
-  public function register()
+  /**
+   * 框架实例
+   *
+   * @var object
+   */
+  private $_app;
+
+  /**
+   * 构造函数
+   */
+  public function __construct()
   {
+    # code...
+  }
+
+  /**
+   * 魔法函数__get.
+   *
+   * @param string $name 属性名称
+   *
+   * @return mixed
+   */
+  public function __get($name = '')
+  {
+    $name = '_'.$name;
+    return $this->$name;
+  }
+
+  /**
+   * 魔法函数__set.
+   *
+   * @param string $name  属性名称
+   * @param mixed  $value 属性值
+   *
+   * @return mixed
+   */
+  public function __set($name = '', $value = '')
+  {
+    $name = '_'.$name;
+    $this->$name = $value;
+  }
+
+
+  /**
+   * 注册路由处理机制
+   *
+   * @param  App    $app 框架实例
+   * @return void
+   */
+  public function register(App $app)
+  {
+    $this->_app = $app;
     $this->route();
   }
 

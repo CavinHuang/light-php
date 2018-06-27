@@ -11,6 +11,7 @@
 
 namespace Framework\Handles;
 
+use Framework\App;
 use Framework\Exceptions\HttpException;
 
 /**
@@ -24,7 +25,21 @@ use Framework\Exceptions\HttpException;
  */
 class ErrorHandle implements Handle {
 
-  public function register ()
+  /**
+   * 构造函数
+   */
+  public function __construct()
+  {
+    # code...
+  }
+
+  /**
+   * @param \Framework\App $app
+   * @return mixed|void
+   * @author cavinHUang
+   * @date   2018/6/27 0027 下午 2:45
+   **/
+  public function register (App $app)
   {
     // 注册一个会在php中止时执行的函数
     register_shutdown_function([$this, 'shutdown']);

@@ -9,7 +9,9 @@
  *                                               *
  *************************************************/
 
-// namespace Framework;
+namespace Framework;
+
+use \Closure;
 
 /**
  * Class App
@@ -23,6 +25,39 @@
 class App {
 
   /**
+   * 框架自身加载的方法集合
+   *
+   * @var array
+   */
+  private $_handleList = [];
+
+  /**
+   * 框架自身缓存
+   *
+   * @var
+   */
+  public static $app;
+
+  /**
+   * 请求对象
+   *
+   * @var
+   */
+  public $request;
+
+  /**
+   * 响应对象
+   *
+   * @var
+   */
+  public $responseData;
+
+  public function __construct () {
+    self::$app = $this;
+
+  }
+
+  /**
    * 用于加载各种方法
    * @author cavinHUang
    * @date   2018/6/26 0026 下午 4:12
@@ -30,6 +65,60 @@ class App {
    */
   public function load($handle)
   {
-    $handle()->register();
+    $this->_handleList[] = $handle;
+  }
+
+  /**
+   * 启动框架
+   *
+   * @author cavinHUang
+   * @date   2018/6/27 0027 上午 9:41
+   *
+   */
+  public function run(Closure $request)
+  {
+    $this->request = $request();
+    foreach ($this->_handleList as $handle) {
+      $handle()->register();
+    }
+  }
+
+  /**
+   * 完整跑完整个流程，返回给请求
+   *
+   * @param \Closure $closure
+   * @author cavinHUang
+   * @date   2018/6/27 0027 上午 9:41
+   *
+   */
+  public function response(Closure $closure)
+  {
+    $closure()->restSuccess($this->responseData);
+  }
+
+  /**
+   * 魔术方法获取变量
+   *
+   * @author cavinHUang
+   * @date   2018/6/27 0027 上午 9:42
+   *
+   */
+  public function __get($name)
+  {
+    $name = '_' . $name;
+    return $this->$name;
+  }
+
+  /**
+   * 魔术方法设置变量
+   *
+   * @author cavinHUang
+   * @date   2018/6/27 0027 上午 11:07
+   *
+   */
+  public function __set($name, $value)
+  {
+    $name = '_' . $name;
+    $this->$name = $value;
   }
 }
