@@ -9,18 +9,15 @@
  *                                               *
  *************************************************/
 
-namespace Framework\Handles;
+namespace Test;
 
-use Framework\App;
+use PHPUnit\Framework\TestCase as PhpunitCase;
 
-interface Handle
+/**
+ * 单元测试用例
+ *
+ */
+class TestCase extends PhpunitCase
 {
-  /**
-   * 注册接口
-   * @return mixed
-   * @author cavinHUang
-   * @date   2018/6/26 0026 下午 4:03
-   *
-   */
-  public function register (App $app);
+
 }

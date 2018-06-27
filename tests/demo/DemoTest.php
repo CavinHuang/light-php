@@ -9,18 +9,27 @@
  *                                               *
  *************************************************/
 
-namespace Framework\Handles;
+namespace Tests\Demo;
 
-use Framework\App;
+use App\Demo\Controllers\Index;
+use Test\TestCase;
 
-interface Handle
+/**
+ * 单元测试 示例
+ *
+ */
+class DemoTest extends TestCase
 {
-  /**
-   * 注册接口
-   * @return mixed
-   * @author cavinHUang
-   * @date   2018/6/26 0026 下午 4:03
-   *
-   */
-  public function register (App $app);
+    /**
+     *　演示测试
+     */
+    public function testDemo()
+    {
+        $index = new Index();
+
+        $this->assertEquals(
+            'Hello Easy PHP',
+            $index->index()
+        );
+    }
 }

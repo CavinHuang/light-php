@@ -26,11 +26,46 @@ use Framework\App;
 class RouteHandle implements Handle {
 
   /**
-   * 框架实例
+   * 框架实例.
    *
-   * @var object
+   * @var App
    */
-  private $_app;
+  private $app;
+
+  /**
+   * 默认模块.
+   *
+   * @var string
+   */
+  private $moduleName = '';
+
+  /**
+   * 默认控制器.
+   *
+   * @var string
+   */
+  private $controllerName = '';
+
+  /**
+   * 默认操作.
+   *
+   * @var string
+   */
+  private $actionName = '';
+
+  /**
+   * 默认操作.
+   *
+   * @var string
+   */
+  private $routeStrategy = '';
+
+  /**
+   * 请求uri.
+   *
+   * @var string
+   */
+  private $requestUri = '';
 
   /**
    * 构造函数
@@ -70,72 +105,138 @@ class RouteHandle implements Handle {
 
   /**
    * 注册路由处理机制
-   *
-   * @param  App    $app 框架实例
+   * @param  App $app 框架实例
    * @return void
+   * @throws \Exception
    */
   public function register(App $app)
   {
-    $this->_app = $app;
+    // request uri
+    $this->requestUri = $app::$container->getSingle('request')->server('REQUEST_URI');
+    // App
+    $this->app = $app;
+    // 获取配置
+    $config = $app::$container->getSingle('config');
+    // 设置默认模块
+    $this->moduleName = $config->config['route']['default_module'];
+    // 设置默认控制器
+    $this->controllerName = $config->config['route']['default_controller'];
+    // 设置默认操作
+    $this->actionName = $config->config['route']['default_action'];
+
+    /* 路由策略　*/
+    $this->routeStrategy = 'pathinfo';
+    if (strpos($this->requestUri, 'index.php')) {
+      $this->routeStrategy = 'general';
+    }
+
+    // 开启路由
     $this->route();
   }
 
   /**
-   * 路由映射
+   * 路由极致.
+   * @throws \ReflectionException
+   * @throws \Framework\Exceptions\HttpException
    * @throws \Exception
-   * @author cavinHUang
-   * @date   2018/6/26 0026 下午 5:03
-   *
    */
   public function route()
   {
+    // 路由策略
+    $strategy = $this->routeStrategy;
+    $this->$strategy();
 
-    preg_match_all('/^\/(.*)\?/', $_SERVER['REQUEST_URI'], $uri);
-    $uri = $uri[1][0];
-    if (empty($uri)) {
-      throw new HttpException(404);
+    // 获取控制器类
+    $controllerName = ucfirst($this->controllerName);
+    $controllerPath = "App\\{$this->moduleName}\\Controllers\\{$controllerName}";
+    // 反射解析当前控制器类　判断是否有当前操作方法
+    $reflaction = new \ReflectionClass($controllerPath);
+    if (!$reflaction->hasMethod($this->actionName)) {
+      throw new HttpException(404, 'Action:'.$this->actionName);
     }
-    $uri = explode('/', $uri);
+    // 实例化当前控制器
+    $controller = new $controllerPath();
+    // 调用操作
+    $actionName = $this->actionName;
+    // 获取返回值
+    $this->app->responseData = $controller->$actionName();
+  }
 
+  /**
+   * 普通路由　url路径.
+   */
+  public function general()
+  {
+    $app = $this->app;
+    $request = $app::$container->getSingle('request');
+    $moduleName = $request->request('module');
+    $controllerName = $request->request('controller');
+    $actionName = $request->request('action');
+    if (!empty($moduleName)) {
+      $this->moduleName = $moduleName;
+    }
+    if (!empty($controllerName)) {
+      $this->controllerName = $controllerName;
+    }
+    if (!empty($actionName)) {
+      $this->actionName = $actionName;
+    }
+  }
+
+  /**
+   * pathinfo url路径.
+   */
+  public function pathinfo()
+  {
+    /* 匹配出uri */
+    if (strpos($this->requestUri, '?')) {
+      preg_match_all('/^\/(.*)\?/', $this->requestUri, $uri);
+    } else {
+      preg_match_all('/^\/(.*)/', $this->requestUri, $uri);
+    }
+
+    if (!isset($uri[1][0])) {
+      /*
+      * 使用默认模块/控制器/操作逻辑
+      */
+      return;
+    }
+    $uri = $uri[1][0];
+    $uri = explode('/', $uri);
     switch (count($uri)) {
       case 3:
-        /**
-         * 默认模块/控制器/操作逻辑
-         */
-        $moduleName     = $uri['0'];
-        $controllerName = $uri['1'];
-        $actionName     = $uri['2'];
+        $this->moduleName = $uri['0'];
+        $this->controllerName = $uri['1'];
+        $this->actionName = $uri['2'];
         break;
 
       case 2:
-        /**
-         * 默认模块
-         */
-
+        /*
+        * 使用默认模块
+        */
+        $this->controllerName = $uri['0'];
+        $this->actionName = $uri['1'];
         break;
       case 1:
-        /**
-         * 默认模块/控制器
-         */
-
+        /*
+        * 使用默认模块/控制器
+        */
+        $this->actionName = $uri['0'];
         break;
 
       default:
-        /**
-         * 默认模块/控制器/操作逻辑
-         */
+        /*
+        * 使用默认模块/控制器/操作逻辑
+        */
         break;
     }
+  }
 
-
-    $controllerPath = 'App\\' . $moduleName . '\\Controllers\\' . $controllerName;
-
-    $reflaction = new \ReflectionClass($controllerPath);
-
-    if(!$reflaction->hasMethod($actionName)) {
-      throw new HttpException(404, 'Action:' . $actionName .' In '. $controllerName . 'Controller');
-    }
-    $controller = new $controllerPath();
-    $controller->$actionName();
+  /**
+   * 路由配置文件　路由规则.
+   */
+  public function config()
+  {
+    // code...
   }
 }

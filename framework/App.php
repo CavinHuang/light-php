@@ -52,9 +52,16 @@ class App {
    */
   public $responseData;
 
+  /**
+   * 服务容器
+   *
+   * @var object
+   */
+  public static $container;
+
   public function __construct () {
     self::$app = $this;
-
+    self::$container = new Container();
   }
 
   /**
@@ -77,9 +84,9 @@ class App {
    */
   public function run(Closure $request)
   {
-    $this->request = $request();
+    self::$container->setSingle('request', $request);
     foreach ($this->_handleList as $handle) {
-      $handle()->register();
+      $handle()->register($this);
     }
   }
 
@@ -105,7 +112,6 @@ class App {
    */
   public function __get($name)
   {
-    $name = '_' . $name;
     return $this->$name;
   }
 
@@ -118,7 +124,6 @@ class App {
    */
   public function __set($name, $value)
   {
-    $name = '_' . $name;
     $this->$name = $value;
   }
 }

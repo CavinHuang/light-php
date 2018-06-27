@@ -25,6 +25,8 @@ class Loader {
    */
   public static function register () {
     spl_autoload_register(['Loader', 'autoLoad']);
+    // 引入composer自加载文件
+    require(ROOT_PATH . '/vendor/autoload.php');
   }
 
   /**

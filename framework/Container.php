@@ -81,38 +81,46 @@ class Container {
    * @throws \Framework\Exceptions\HttpException
    * @throws \Exception
    */
-  public function setSingle($alias = '', $obj = null)
+  public function setSingle($alias = '', $object = '')
   {
-    // 判断两个参数是否作为函数调用
     if (is_callable($alias)) {
-      $instance = $alias();
-      $className = get_class_name($instance);
+      $instance  = $alias();
+      $className = get_class($instance);
       $this->_instanceMap[$className] = $instance;
-      return true;
+      return;
     }
-
-    if (!is_null($obj) && is_callable($obj)) {
-      if (!empty($alias)) {
-        $this->_instanceMap[$alias] = $obj;
-        return true;
+    if (is_callable($object)) {
+      if (empty($alias)) {
+        throw new HttpException(
+          400,
+          "{$alias} is empty"
+        );
       }
-      throw new HttpException(400, $alias.' is empty.');
+      $this->_instanceMap[$alias] = $object();
+      return;
     }
-
-    // 判断两个参数是否是对象
-    if (!is_null($obj) && is_object($obj)) {
+    if (is_object($alias)) {
       $className = get_class($alias);
-      if (!array_key_exists($className, $this->_instanceMap)) {
-        $this->_instanceMap[$className] = $alias;
-        return true;
+      if (array_key_exists($className, $this->_instanceMap)) {
+        return;
       }
-      throw new HttpException(400, $alias.' already exists.');
+      $this->_instanceMap[$className] = $alias;
+      return;
     }
-
+    if (is_object($object)) {
+      if (empty($alias)) {
+        throw new HttpException(
+          400,
+          "{$alias} is empty"
+        );
+      }
+      $this->_instanceMap[$alias] = $object;
+      return;
+    }
     if (empty($alias) && empty($object)) {
       throw new HttpException(
         400,
-        "{$alias} and {$obj} is empty"
+        "{$alias} and {$object} is empty"
       );
     }
     $this->_instanceMap[$alias] = new $alias();

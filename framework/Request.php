@@ -140,7 +140,7 @@ class Request {
    * @param  string $value 参数名
    * @return mixed
    */
-  public function getServer($value = '')
+  public function server($value = '')
   {
     if (!empty($value)) {
       if (isset($this->_serverParams[$value])) return $this->_serverParams[$value];

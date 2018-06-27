@@ -11,10 +11,23 @@
 
 namespace app\demo\controllers;
 
+use Framework\App;
+
 class Index {
 
-  public function index () {
+  public function hello () {
 
     return 'Hello lightPHP';
+  }
+
+  /**
+   * demo
+   *
+   * @return json
+   */
+  public function get()
+  {
+    return App::$container->getSingle('request')
+      ->get('password', 'aaa');
   }
 }

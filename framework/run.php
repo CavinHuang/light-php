@@ -16,8 +16,9 @@ use Framework\Exceptions\HttpException;
 use Framework\Request;
 use Framework\Response;
 use Framework\App;
+use Framework\Handles\ConfigHandle;
 
-define('ROOT_PATH', dirname($_SERVER['SCRIPT_FILENAME']) . '/..');
+define('ROOT_PATH', __DIR__ . '/..');
 
 require(ROOT_PATH . '/framework/Loader.php');
 
@@ -33,6 +34,11 @@ try {
   /*$app->load(function(){
     return new ExceptionHandle();
   });*/
+
+  // 加载预定义配置机制
+  $app->load(function() {
+    return new ConfigHandle();
+  });
 
   $app->load(function(){
     return new RouteHandle();
