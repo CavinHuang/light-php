@@ -9,13 +9,26 @@
  *                                               *
  *************************************************/
 
-// namespace Framework;
+namespace Framework;
 
 use Framework\Exceptions\HttpException;
+use Framework\App;
 
 class Loader {
 
+  /**
+   * 类名映射
+   *
+   * @var array
+   */
   public static $map = [];
+
+  /**
+   * 类命名空间映射
+   *
+   * @var array
+   */
+  public static $namespaceMap = [];
 
   /**
    * 注册器
@@ -23,8 +36,13 @@ class Loader {
    * @date   2018/6/26 0026 下午 4:14
    *
    */
-  public static function register () {
-    spl_autoload_register(['Loader', 'autoLoad']);
+  public static function register (App $app) {
+
+    self::$namespaceMap = [
+      'Framework' => $app->rootPath
+    ];
+
+    spl_autoload_register(['Framework\Loader', 'autoLoad']);
     // 引入composer自加载文件
     require(ROOT_PATH . '/vendor/autoload.php');
   }

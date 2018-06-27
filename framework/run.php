@@ -20,12 +20,13 @@ use Framework\Handles\ConfigHandle;
 
 define('ROOT_PATH', __DIR__ . '/..');
 
-require(ROOT_PATH . '/framework/Loader.php');
+require(ROOT_PATH . '/framework/App.php');
 
 try {
-  Loader::register();
-
-  $app = new App();
+  /* 初始化应用 */
+  $app = new App(__DIR__ . '/..', function () {
+    return require(__DIR__ . '/Loader.php');
+  });
 
   $app->load(function(){
     return new ErrorHandle();

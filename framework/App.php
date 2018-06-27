@@ -53,13 +53,27 @@ class App {
   public $responseData;
 
   /**
+   * 框架实例根目录
+   *
+   * @var string
+   */
+  private $rootPath;
+
+  /**
    * 服务容器
    *
    * @var object
    */
   public static $container;
 
-  public function __construct () {
+  public function __construct ($rootPath, Closure $loader) {
+    // 根目录
+    $this->rootPath = $rootPath;
+
+    // 注册自加载
+    $loader();
+    Loader::register($this);
+
     self::$app = $this;
     self::$container = new Container();
   }

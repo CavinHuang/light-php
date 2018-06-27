@@ -142,6 +142,8 @@ class RouteHandle implements Handle {
    */
   public function route()
   {
+    var_dump($this->actionName);
+
     // 路由策略
     $strategy = $this->routeStrategy;
     $this->$strategy();
@@ -195,7 +197,7 @@ class RouteHandle implements Handle {
       preg_match_all('/^\/(.*)/', $this->requestUri, $uri);
     }
 
-    if (!isset($uri[1][0])) {
+    if (!isset($uri[1][0]) || $uri[1][0] == '') {
       /*
       * 使用默认模块/控制器/操作逻辑
       */
