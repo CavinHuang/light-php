@@ -45,11 +45,11 @@ try {
     return new RouteHandle();
   });
 
-  $app->run(function(){
-    return new Request();
+  $app->run(function() use ($app) {
+    return new Request($app);
   });
 
-  $app->response(function (){
+  $app->response(function () {
     return new Response();
   });
 

@@ -51,15 +51,67 @@ class Request {
   private $_requestParams = [];
 
   /**
+   * http方法名称
+   * @var string
+   */
+  private $method = '';
+
+  /**
+   * 服务ip
+   * @var string
+   */
+  private $serverIp = '';
+
+  /**
+   * 客户端ip
+   * @var string
+   */
+  private $clientIp = '';
+
+  /**
+   * 请求开始时间
+   * @var float
+   */
+  private $beginTime = 0;
+
+  /**
+   * 请求结束时间
+   * @var float
+   */
+  private $endTime = 0;
+
+  /**
+   * 请求消耗时间
+   *
+   * 毫秒
+   *
+   * @var int
+   */
+  private $consumeTime = 0;
+
+  /**
    * 构造函数
    *
    * Request constructor.
    */
-  public function __construct () {
-    $this->_serverParams = $_SERVER;
-    $this->_getParams = $_GET;
-    $this->_postParams = $_POST;
-    $this->_requestParams = $_REQUEST;
+  public function __construct (App $app) {
+
+    $this->serverParams = $_SERVER;
+    $this->method       = isset($_SERVER['REQUEST_METHOD'])? strtolower($_SERVER['REQUEST_METHOD']) : 'get';
+    $this->serverIp     = isset($_SERVER['REMOTE_ADDR'])? $_SERVER['REMOTE_ADDR'] : '';
+    $this->clientIp     = isset($_SERVER['SERVER_ADDR'])? $_SERVER['SERVER_ADDR'] : '';
+    $this->beginTime    = isset($_SERVER['REQUEST_TIME_FLOAT'])? $_SERVER['REQUEST_TIME_FLOAT'] : time();
+    if ($app->isCli === 'yes') {
+      // cli 模式
+      $this->requestParams = $_REQUEST['argv'];
+      $this->getParams     = $_REQUEST['argv'];
+      $this->postParams    = $_REQUEST['argv'];
+    } else {
+      $this->requestParams = $_REQUEST;
+      $this->getParams     = $_GET;
+      $this->postParams    = $_POST;
+    }
+
   }
 
   /**
@@ -71,7 +123,6 @@ class Request {
    */
   public function __get($name = '')
   {
-    $name = '_'.$name;
     return $this->$name;
   }
 
@@ -85,7 +136,6 @@ class Request {
    */
   public function __set($name = '', $value = '')
   {
-    $name = '_'.$name;
     $this->$name = $value;
   }
 

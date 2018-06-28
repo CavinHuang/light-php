@@ -68,6 +68,57 @@ class RouteHandle implements Handle {
   private $requestUri = '';
 
   /**
+   * 配置实例
+   *
+   * @var
+   */
+  private $config;
+
+  /**
+   * 自定义路由规则
+   *
+   * get请求
+   *
+   * 查询数据
+   *
+   * @var array
+   */
+  private $getMap = [];
+
+  /**
+   * 自定义路由规则
+   *
+   * post请求
+   *
+   * 新增数据
+   *
+   * @var array
+   */
+  private $postMap = [];
+
+  /**
+   * 自定义路由规则
+   *
+   * put请求
+   *
+   * 更新数据
+   *
+   * @var array
+   */
+  private $putMap = [];
+
+  /**
+   * 自定义路由规则
+   *
+   * delete请求
+   *
+   * 删除数据
+   *
+   * @var array
+   */
+  private $deleteMap = [];
+
+  /**
    * 构造函数
    */
   public function __construct()
@@ -84,7 +135,6 @@ class RouteHandle implements Handle {
    */
   public function __get($name = '')
   {
-    $name = '_'.$name;
     return $this->$name;
   }
 
@@ -98,10 +148,56 @@ class RouteHandle implements Handle {
    */
   public function __set($name = '', $value = '')
   {
-    $name = '_'.$name;
     $this->$name = $value;
   }
 
+  /**
+   * 自定义get请求路由
+   *
+   * @param  string $uri      请求uri
+   * @param  mixed  $function 匿名函数或者控制器方法标示
+   * @return void
+   */
+  public function get($uri = '', $function = '')
+  {
+    $this->getMap[$uri] = $function;
+  }
+
+  /**
+   * 自定义post请求路由
+   *
+   * @param  string $uri      请求uri
+   * @param  mixed  $function 匿名函数或者控制器方法标示
+   * @return void
+   */
+  public function post($uri = '', $function = '')
+  {
+    $this->postMap[$uri] = $function;
+  }
+
+  /**
+   * 自定义put请求路由
+   *
+   * @param  string $uri      请求uri
+   * @param  mixed  $function 匿名函数或者控制器方法标示
+   * @return void
+   */
+  public function put($uri = '', $function = '')
+  {
+    $this->putMap[$uri] = $function;
+  }
+
+  /**
+   * 自定义delete请求路由
+   *
+   * @param  string $uri      请求uri
+   * @param  mixed  $function 匿名函数或者控制器方法标示
+   * @return void
+   */
+  public function delete($uri = '', $function = '')
+  {
+    $this->deleteMap[$uri] = $function;
+  }
 
   /**
    * 注册路由处理机制
@@ -116,17 +212,17 @@ class RouteHandle implements Handle {
     // App
     $this->app = $app;
     // 获取配置
-    $config = $app::$container->getSingle('config');
+    $this->config = $app::$container->getSingle('config');
     // 设置默认模块
-    $this->moduleName = $config->config['route']['default_module'];
+    $this->moduleName = $this->config->config['route']['default_module'];
     // 设置默认控制器
-    $this->controllerName = $config->config['route']['default_controller'];
+    $this->controllerName = $this->config->config['route']['default_controller'];
     // 设置默认操作
-    $this->actionName = $config->config['route']['default_action'];
+    $this->actionName = $this->config->config['route']['default_action'];
 
     /* 路由策略　*/
     $this->routeStrategy = 'pathinfo';
-    if (strpos($this->requestUri, 'index.php')) {
+    if (strpos($this->requestUri, 'index.php') || $app->isCli === 'yes') {
       $this->routeStrategy = 'general';
     }
 
@@ -146,14 +242,30 @@ class RouteHandle implements Handle {
     $strategy = $this->routeStrategy;
     $this->$strategy();
 
+    if ($this->userDefined()) {
+      return;
+    }
+
+    // 判断模块存不存在
+    if (! in_array(strtolower($this->moduleName), $this->config->config['module'])) {
+      throw new HttpException(404, 'Module:'.$this->moduleName);
+    }
+
     // 获取控制器类
     $controllerName = ucfirst($this->controllerName);
     $controllerPath = "App\\{$this->moduleName}\\Controllers\\{$controllerName}";
+
+    // 判断控制器存不存在
+    if (! class_exists($controllerPath)) {
+      throw new HttpException(404, 'Controller:'.$controllerName);
+    }
+
     // 反射解析当前控制器类　判断是否有当前操作方法
-    $reflaction = new \ReflectionClass($controllerPath);
+    $reflaction     = new \ReflectionClass($controllerPath);
     if (!$reflaction->hasMethod($this->actionName)) {
       throw new HttpException(404, 'Action:'.$this->actionName);
     }
+
     // 实例化当前控制器
     $controller = new $controllerPath();
     // 调用操作
@@ -199,6 +311,9 @@ class RouteHandle implements Handle {
       /*
       * 使用默认模块/控制器/操作逻辑
       */
+      if ($this->app->isCli === 'yes') {
+        $this->app->notOutput = true;
+      }
       return;
     }
     $uri = $uri[1][0];
@@ -233,10 +348,44 @@ class RouteHandle implements Handle {
   }
 
   /**
-   * 路由配置文件　路由规则.
+   * 自定义路由
+   * @return bool
+   * @throws \Framework\Exceptions\HttpException
+   * @throws \Exception
    */
-  public function config()
+  private function userDefined()
   {
-    // code...
+    $module = $this->config->config['module'];
+    foreach ($module as $v) {
+      // 加载自定义路由配置文件
+      $routeFile = "{$this->app->rootPath}/config/{$v}/route.php";
+      if (file_exists($routeFile)) {
+        require($routeFile);
+      }
+    }
+    // 路由匹配
+    $uri = "{$this->moduleName}/{$this->controllerName}/{$this->actionName}";
+    if (! array_key_exists($uri, $this->getMap)) {
+      return false;
+    }
+
+    // 执行自定义路由匿名函数
+    $app     = $this->app;
+    $request = $app::$container->getSingle('request');
+    $method  = $request->method . 'Map';
+    if (! isset($this->$method)) {
+      throw new HttpException(
+        404,
+        'Http Method:'. $request->method
+      );
+    }
+    $map = $this->$method;
+    $this->app->responseData = $map[$uri]($app);
+
+    if ($this->app->isCli === 'yes') {
+      $this->app->notOutput = false;
+    }
+
+    return true;
   }
 }

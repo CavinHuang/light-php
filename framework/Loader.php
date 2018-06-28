@@ -44,7 +44,7 @@ class Loader {
 
     spl_autoload_register(['Framework\Loader', 'autoLoad']);
     // 引入composer自加载文件
-    require(ROOT_PATH . '/vendor/autoload.php');
+    require($app->rootPath . '/vendor/autoload.php');
   }
 
   /**

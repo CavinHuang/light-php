@@ -21,8 +21,11 @@
  */
 $help = function () {
     $string =  <<<HELP
-    \033[36m Usage \033[0m:
+    \033[36m Cli Usage \033[0m:
         php cli --env=<environment> --method=<value> --<arguments>=<value> ...
+
+    \033[36m Example \033[0m:
+        php cli --method=demo.index.get --username=test
 
     \033[36m Params mean \033[0m:
         \033[33m env \033[0m:          Script run environment
@@ -30,7 +33,16 @@ $help = function () {
         \033[33m arguments \033[0m:    Input arguments
         \033[33m help      \033[0m:    Display command list
 
-    \033[32m A lightweight PHP framework for studying. \033[0m
+    \033[36m Web Server Usage \033[0m:
+        step 1: cd public
+        step 2: php -S <addr>:<port>
+
+        For example, php -S 'localhost:666', after that open website 'http://localhost:666/'
+
+    \033[32mEasy PHP: A lightweight PHP framework for studying. Version 0.6.6\033[0m
+
+    \033[32mAuthor  : TIGERB <https://github.com/TIGERB>\033[0m
+    \n
 HELP;
 
     die($string);
@@ -42,6 +54,7 @@ HELP;
 if (count($argv) === 1) {
     $help();
 }
+$input = [];
 foreach ($argv as $v) {
     preg_match_all('/^--(.*)/', $v, $match);
     if (isset($match[1][0]) && ! empty($match[1][0])) {
@@ -54,6 +67,16 @@ foreach ($argv as $v) {
         }
     }
 }
+
+// 设置cli模式
+putenv('IS_CLI=yes');
+$method              = $input['method'];
+$method              = explode('.', $method);
+$input['module']     = $method[0];
+$input['controller'] = $method[1];
+$input['action']     = $method[2];
+unset($input['method']);
+$_REQUEST['argv'] = $input;
 
 // 载入框架运行文件
 require('framework/run.php');
