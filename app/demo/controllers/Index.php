@@ -16,8 +16,8 @@ use Framework\App;
 class Index {
 
   public function hello () {
-
-    return 'Hello lightPHP';
+    $get = App::$container->getSingle('request')->get();
+    return ['text' => 'Hello lightPHP', 'get' => $get];
   }
 
   /**
@@ -29,5 +29,21 @@ class Index {
   {
     return App::$container->getSingle('request')
       ->get('password', 'aaa');
+  }
+  /**
+   * 框架内部调用演示
+   *
+   * 极大的简化了内部模块依赖的问题
+   *
+   * 可构建微单体建构
+   *
+   * @example domain/Demo/Index/micro
+   * @return  json
+   */
+  public function micro()
+  {
+    return App::$app->get('demo/index/hello', [
+      'user' => 'TIGERB'
+    ]);
   }
 }

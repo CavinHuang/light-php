@@ -207,6 +207,8 @@ class RouteHandle implements Handle {
    */
   public function register(App $app)
   {
+    // 注入当前对象到容器中
+    $app::$container->setSingle('router', $this);
     // request uri
     $this->requestUri = $app::$container->getSingle('request')->server('REQUEST_URI');
     // App
@@ -387,5 +389,15 @@ class RouteHandle implements Handle {
     }
 
     return true;
+  }
+
+  /**
+   * APP内部调用　可构建微单体架构
+   *
+   * @return void
+   */
+  public function microMonomer()
+  {
+    # do nothing...
   }
 }

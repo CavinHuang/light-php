@@ -27,58 +27,58 @@ class Request {
    *
    * @var array
    */
-  private $_serverParams = [];
+  public $serverParams = [];
 
   /**
    * GET参数集合
    *
    * @var array
    */
-  private $_getParams = [];
+  public $getParams = [];
 
   /**
    * POST参数集合
    *
    * @var array
    */
-  private $_postParams = [];
+  public $postParams = [];
 
   /**
    * request 参数集合
    *
    * @var array
    */
-  private $_requestParams = [];
+  public $requestParams = [];
 
   /**
    * http方法名称
    * @var string
    */
-  private $method = '';
+  public $method = '';
 
   /**
    * 服务ip
    * @var string
    */
-  private $serverIp = '';
+  public $serverIp = '';
 
   /**
    * 客户端ip
    * @var string
    */
-  private $clientIp = '';
+  public $clientIp = '';
 
   /**
    * 请求开始时间
    * @var float
    */
-  private $beginTime = 0;
+  public $beginTime = 0;
 
   /**
    * 请求结束时间
    * @var float
    */
-  private $endTime = 0;
+  public $endTime = 0;
 
   /**
    * 请求消耗时间
@@ -87,7 +87,7 @@ class Request {
    *
    * @var int
    */
-  private $consumeTime = 0;
+  public $consumeTime = 0;
 
   /**
    * 构造函数
@@ -148,10 +148,10 @@ class Request {
   public function get($value = '')
   {
     if (!empty($value)) {
-      if (isset($this->_getParams[$value])) return $this->_getParams[$value];
+      if (isset($this->getParams[$value])) return $this->getParams[$value];
       return '';
     }
-    return $this->_getParams;
+    return $this->getParams;
   }
 
   /**
@@ -163,10 +163,10 @@ class Request {
   public function post($value = '')
   {
     if (!empty($value)) {
-      if (isset($this->_postParams[$value])) return $this->_postParams[$value];
+      if (isset($this->postParams[$value])) return $this->postParams[$value];
       return '';
     }
-    return $this->_postParams;
+    return $this->postParams;
   }
 
   /**
@@ -178,10 +178,10 @@ class Request {
   public function request($value = '')
   {
     if (!empty($value)) {
-      if (isset($this->_requestParams[$value])) return $this->_requestParams[$value];
+      if (isset($this->requestParams[$value])) return $this->requestParams[$value];
       return '';
     }
-    return $this->_requestParams;
+    return $this->requestParams;
   }
 
   /**
@@ -192,10 +192,9 @@ class Request {
    */
   public function server($value = '')
   {
-    if (!empty($value)) {
-      if (isset($this->_serverParams[$value])) return $this->_serverParams[$value];
-      return '';
+    if (isset($this->serverParams[$value])) {
+      return $this->serverParams[$value];
     }
-    return $this->_serverParams;
+    return '';
   }
 }
