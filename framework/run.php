@@ -17,6 +17,7 @@ use Framework\Request;
 use Framework\Response;
 use Framework\App;
 use Framework\Handles\ConfigHandle;
+use Framework\Handles\NosqlHandle;
 
 define('ROOT_PATH', __DIR__ . '/..');
 
@@ -39,6 +40,10 @@ try {
   // 加载预定义配置机制
   $app->load(function() {
     return new ConfigHandle();
+  });
+
+  $app->load(function() {
+    return new NosqlHandle();
   });
 
   $app->load(function(){
