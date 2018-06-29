@@ -24,16 +24,13 @@ return [
       'default_action'     => 'hello',
   ],
   'nosql' => [
-    'redis',
-  ],
-
-  /* redis */
-  'redis'  => [
-    // 默认host
-    'host'     => '127.0.0.1',
-    // 默认端口
-    'port'     => 6379,
-    // 密码
-    'password' => '',
+    'redis' => [
+              // 默认host
+              'host'     => '127.0.0.1',
+              // 默认端口
+              'port'     => 6379,
+              // 密码
+              'password' => '',
+            ]
   ]
 ];
