@@ -140,29 +140,29 @@ trait interpretater
 
   /**
    * 插入数据
-   *
    * @param array $data
    * @author cavinHUang
    * @date   2018/7/7 0007 上午 11:22
-   *
+   * @throws \Framework\Exceptions\HttpException
+   * @throws \Exception
    */
   public function insert (Array $data = []) {
     if (empty($data)) throw new HttpException(401, 'db insert data is empty.');
 
-    $this->parseData($data);
+    $this->parseInsertData($data);
 
     return $this->_dbInstance->insert($this);
   }
 
   /**
-   * 解析更新和插入的数据
+   * 解析插入的数据
    *
    * @param array $data
    * @author cavinHUang
    * @date   2018/7/7 0007 上午 11:25
    *
    */
-  public function parseData(Array $data = []) {
+  public function parseInsertData(Array $data = []) {
     $field = '';
     $value = '';
 
@@ -176,6 +176,44 @@ trait interpretater
     $field = substr($field, 0, strlen($field) - 2);
     $value = substr($value, 0, strlen($value) - 2);
     $this->sql = "INSERT INTO {$this->tableName} ({$field}) VALUES ({$value});";
+  }
+
+  /**
+   * 更新数据库
+   * @param array $data
+   * @author cavinHUang
+   * @date   xxx
+   * @throws \Framework\Exceptions\HttpException
+   * @throws \Exception
+   */
+  public function update (Array $data = []) {
+    if (empty($this->where)) throw new HttpException(401, 'update where is empty.');
+    if (empty($data)) throw new HttpException(401, 'update data is empty.');
+
+    $this->parseUpdateData($data);
+    $this->buildSql();
+    return $this->_dbInstance->update($this);
+  }
+
+  /**
+   * 解析更新的数据
+   *
+   * @param array $data
+   * @author cavinHUang
+   * @date   2018/7/7 0007 上午 11:25
+   *
+   */
+  public function parseUpdateData(Array $data = []) {
+    $str = '';
+
+    foreach ($data as $k => $v) {
+      $str .= "{$k}=:$k, ";
+      $this->params[$k] = $v;
+    }
+    unset($v);
+    unset($k);
+    $str = substr($str, 0, strlen($str) - 2);
+    $this->sql = "UPDATE {$this->tableName} SET {$str}";
   }
 
   /**

@@ -60,7 +60,6 @@ class DB {
    */
   private $config = null;
 
-
   /**
    * 设置当前操作表
    *
@@ -99,11 +98,11 @@ class DB {
   }
 
   public function clearParmas () {
-    $this->sql = '';
     $this->where = '';
     $this->offset = '';
     $this->orderBy = '';
-    $this->field = '';
+    $this->field = '*';
+    $this->limit = '';
     $this->params = [];
   }
 
@@ -178,5 +177,71 @@ class DB {
     if (! empty($this->limit)) {
       $this->sql .= $this->limit;
     }
+  }
+
+  /**
+   * 魔术方法设置属性
+   *
+   * @param $name
+   * @author cavinHUang
+   * @date   2018/7/7 0007 下午 2:16
+   *
+   */
+  public function __get ($name) {
+    return $this->$name;
+  }
+
+  /**
+   * 魔术方法设置属性
+   *
+   * @param $name
+   * @param $value
+   * @author cavinHUang
+   * @date   2018/7/7 0007 下午 2:16
+   *
+   */
+  public function __set ($name, $value) {
+    $this->$name = $value;
+  }
+
+  /**
+   * 组织最后的sql语句
+   *
+   * @param $query
+   * @param $params
+   * @return null|string|string[]
+   * @author cavinHUang
+   * @date   xxx
+   *
+   */
+  public function showQuery($query, $params)
+  {
+    $keys = array();
+    $values = array();
+
+    # build a regular expression for each parameter
+    foreach ($params as $key => $value)
+    {
+      if (is_string($key))
+      {
+        $keys[] = '/:'.$key.'/';
+      }
+      else
+      {
+        $keys[] = '/[?]/';
+      }
+
+      if(is_numeric($value))
+      {
+        $values[] = intval($value);
+      }
+      else
+      {
+        $values[] = '"'.$value .'"';
+      }
+    }
+
+    $query = preg_replace($keys, $values, $query, 1, $count);
+    return $query;
   }
 }

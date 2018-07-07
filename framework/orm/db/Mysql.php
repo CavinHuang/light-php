@@ -65,7 +65,7 @@ class Mysql {
    *
    * @var string
    */
-  private $_dsn = '';
+  private $dsn = '';
 
   /**
    * Mysql constructor.
@@ -106,8 +106,8 @@ class Mysql {
   public function fetch (DB $DB) {
     $this->_pdoPreStatement = $this->_pdo->prepare($DB->sql);
     $this->bindValue($DB);
-    $this->_pdoPreStatement->execute();
-    return $this->_pdoPreStatement->fetch(\PDO::FETCH_ASSOC);
+    $this->execute($DB);
+    return $this->_pdoPreStatement->fetch(PDO::FETCH_ASSOC);
   }
 
   /**
@@ -121,15 +121,51 @@ class Mysql {
   public function fetchAll (DB $DB) {
     $this->_pdoPreStatement = $this->_pdo->prepare($DB->sql);
     $this->bindValue($DB);
-    $this->_pdoPreStatement->execute();
-    return $this->_pdoPreStatement->fetchAll(\PDO::FETCH_ASSOC);
+    $this->execute($DB);
+    return $this->_pdoPreStatement->fetchAll(PDO::FETCH_ASSOC);
   }
 
+  /**
+   * pdo执行方法
+   *
+   * @param \Framework\Orm\DB $DB
+   * @author cavinHUang
+   * @date   2018/7/7 0007 下午 2:25
+   *
+   */
+  public function execute (DB $DB) {
+    $this->_pdoPreStatement->execute();
+    $DB->lastSql = $DB->showQuery($this->_pdoPreStatement->queryString, $DB->params);
+    $DB->clearParmas();
+  }
+
+  /**
+   * insert data
+   *
+   * @param \Framework\Orm\DB $DB
+   * @return mixed
+   * @author cavinHUang
+   * @date   xxx
+   *
+   */
   public function insert(DB $DB) {
     $this->_pdoPreStatement = $this->_pdo->prepare($DB->sql);
     $this->bindValue($DB);
-    $this->_pdoPreStatement->execute();
+    $this->execute($DB);
     return $DB->lastId = $this->_pdo->lastInsertId();
+  }
+
+  /**
+   * update data
+   *
+   * @param  DB     $db DB instance
+   * @return boolean
+   */
+  public function update(DB $DB)
+  {
+    $this->_pdoPreStatement = $this->_pdo->prepare($DB->sql);
+    $this->bindValue($DB);
+    return $this->execute($DB);
   }
 
   /**
@@ -141,12 +177,12 @@ class Mysql {
   public function bindValue(DB $db)
   {
     if (empty($db->params)) {
+      $db->clearParmas();
       return;
     }
     foreach ($db->params as $k => $v) {
       $this->_pdoPreStatement->bindValue(":{$k}", $v);
     }
-    $db->clearParmas();
   }
 
   /**

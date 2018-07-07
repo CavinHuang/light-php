@@ -31,6 +31,8 @@ class HttpException extends \Exception {
     // 参数错误或者必传参数为空
     400 => 'Bad Request',
 
+    401 => 'agument is not null',
+
     // 此次请求没有权限
     403 => 'Forbidden',
 

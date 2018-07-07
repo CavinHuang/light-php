@@ -55,16 +55,15 @@ class Index {
   public function orm () {
     $instance = DB::table('test');
      $last = $instance->where(['id' => 1])->fetch();
-     $last2 = $instance->where('id', 1)->fetch();
-     $last3 = $instance->where('id', '>', 1)->fetch();
+     //$last2 = $instance->where('id', 1)->fetch();
+     //$last3 = $instance->where('id', '>', 1)->fetch();
 
-     $fetchAll = $instance->field('id,name')->order('id desc')->limit('0,1')->fetchAll();
+     //$fetchAll = $instance->field('id,name')->where('id', '>', 1)->order('id desc')->limit('0,4')->fetchAll();
 
-     $lastId = $instance->insert(['name' => 'cavinhuang', 'age' => 26]);
+     // $lastId = $instance->insert(['name' => 'cavinhuang', 'age' => 26]);
 
-     $isUpdate = $instance->update(['name' => '1']);
+     // $isUpdate = $instance->where('age', '26')->update(['name' => 'light-php']);
 
-
-     return ['where1' => $last, 'where2' => $last2, 'where3' => $last3, 'fetchAll' => $fetchAll,'lastId' => $instance->lastId, 'lastSql' => $instance->sql];
+     return ['result' => $last,  'lastId' => $instance, 'lastSql' => $instance->lastSql];
   }
 }
