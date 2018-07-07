@@ -13,6 +13,7 @@ namespace Framework\Orm\Db;
 
 
 use Framework\App;
+use Framework\Exceptions\HttpException;
 use Framework\Orm\DB;
 use PDO;
 class Mysql {
@@ -122,6 +123,13 @@ class Mysql {
     $this->bindValue($DB);
     $this->_pdoPreStatement->execute();
     return $this->_pdoPreStatement->fetchAll(\PDO::FETCH_ASSOC);
+  }
+
+  public function insert(DB $DB) {
+    $this->_pdoPreStatement = $this->_pdo->prepare($DB->sql);
+    $this->bindValue($DB);
+    $this->_pdoPreStatement->execute();
+    return $DB->lastId = $this->_pdo->lastInsertId();
   }
 
   /**

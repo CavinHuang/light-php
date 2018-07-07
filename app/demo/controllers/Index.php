@@ -58,10 +58,13 @@ class Index {
      $last2 = $instance->where('id', 1)->fetch();
      $last3 = $instance->where('id', '>', 1)->fetch();
 
-    $fetchAll = $instance->field('id,name')->order('id desc')->limit('0,1')->fetchAll();
+     $fetchAll = $instance->field('id,name')->order('id desc')->limit('0,1')->fetchAll();
+
+     $lastId = $instance->insert(['name' => 'cavinhuang', 'age' => 26]);
+
+     $isUpdate = $instance->update(['name' => '1']);
 
 
-
-     return ['where1' => $last, 'where2' => $last2, 'where3' => $last3, 'fetchAll' => $fetchAll, 'lastSql' => $instance->sql];
+     return ['where1' => $last, 'where2' => $last2, 'where3' => $last3, 'fetchAll' => $fetchAll,'lastId' => $instance->lastId, 'lastSql' => $instance->sql];
   }
 }

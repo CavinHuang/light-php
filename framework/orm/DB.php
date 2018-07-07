@@ -51,7 +51,7 @@ class DB {
    *
    * @var string
    */
-  private $_lastId = '';
+  public $lastId = '';
 
   /**
    * 当前初始化的配置
@@ -103,6 +103,7 @@ class DB {
     $this->where = '';
     $this->offset = '';
     $this->orderBy = '';
+    $this->field = '';
     $this->params = [];
   }
 

@@ -10,6 +10,7 @@
  *************************************************/
 
 namespace Framework\Orm;
+use Framework\Exceptions\HttpException;
 
 /**
  * Class interpretater
@@ -133,8 +134,48 @@ trait interpretater
     foreach ($fields as $v) {
       $fieldStr .= "`{$v}`,";
     }
-
+    unset($v);
     return substr($fieldStr, 0, strlen($fieldStr) - 1);
+  }
+
+  /**
+   * 插入数据
+   *
+   * @param array $data
+   * @author cavinHUang
+   * @date   2018/7/7 0007 上午 11:22
+   *
+   */
+  public function insert (Array $data = []) {
+    if (empty($data)) throw new HttpException(401, 'db insert data is empty.');
+
+    $this->parseData($data);
+
+    return $this->_dbInstance->insert($this);
+  }
+
+  /**
+   * 解析更新和插入的数据
+   *
+   * @param array $data
+   * @author cavinHUang
+   * @date   2018/7/7 0007 上午 11:25
+   *
+   */
+  public function parseData(Array $data = []) {
+    $field = '';
+    $value = '';
+
+    foreach ($data as $k => $v) {
+      $field .= "`{$k}`, ";
+      $value .= ":{$k}, ";
+      $this->params[$k] = $v;
+    }
+    unset($v);
+    unset($k);
+    $field = substr($field, 0, strlen($field) - 2);
+    $value = substr($value, 0, strlen($value) - 2);
+    $this->sql = "INSERT INTO {$this->tableName} ({$field}) VALUES ({$value});";
   }
 
   /**
