@@ -11,10 +11,10 @@
 return [
   /* 默认配置 */
   'database' => [
-    'dbtype'   => 'mysql',
-    'dbname'   => 'test',
-    'host'     => 'localhost',
-    'username' => 'root',
-    'password' => '214'
+    'type'      => 'mysql',
+    'name'      => 'test',
+    'host'      => 'localhost',
+    'username'  => 'tywl',
+    'password'  => 'tykj5355988'
   ]
 ];

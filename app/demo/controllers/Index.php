@@ -12,6 +12,7 @@
 namespace app\demo\controllers;
 
 use Framework\App;
+use Framework\Orm\DB;
 
 class Index {
 
@@ -45,5 +46,22 @@ class Index {
     return App::$app->get('demo/index/hello', [
       'user' => 'TIGERB'
     ]);
+  }
+
+  /**
+   * @author cavinHUang
+   * @date   xxx
+   **/
+  public function orm () {
+    $instance = DB::table('test');
+     $last = $instance->where(['id' => 1])->fetch();
+     $last2 = $instance->where('id', 1)->fetch();
+     $last3 = $instance->where('id', '>', 1)->fetch();
+
+    $fetchAll = $instance->field('id,name')->order('id desc')->limit('0,1')->fetchAll();
+
+
+
+     return ['where1' => $last, 'where2' => $last2, 'where3' => $last3, 'fetchAll' => $fetchAll, 'lastSql' => $instance->sql];
   }
 }

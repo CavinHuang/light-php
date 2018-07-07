@@ -72,12 +72,10 @@ class Container {
   }
 
   /**
-   * 注入一个单例
-   * @param string $alias 别名或者类名
+   * 注入一个单例类
+   * @param string $alias 类名或别名
    * @param object||closure||string $object 实例或闭包或类名
-   * @return callable|null|string
-   * @author       cavinHUang
-   * @date         2018/6/27 0027 下午 2:42
+   * @return object
    * @throws \Framework\Exceptions\HttpException
    * @throws \Exception
    */
@@ -87,7 +85,7 @@ class Container {
       $instance  = $alias();
       $className = get_class($instance);
       $this->_instanceMap[$className] = $instance;
-      return;
+      return $instance;
     }
     if (is_callable($object)) {
       if (empty($alias)) {
@@ -96,16 +94,20 @@ class Container {
           "{$alias} is empty"
         );
       }
+      if (array_key_exists($alias, $this->_instanceMap)) {
+        var_dump($this->_instanceMap);
+        return $this->_instanceMap[$alias];
+      }
       $this->_instanceMap[$alias] = $object();
-      return;
+      return $this->_instanceMap[$alias];
     }
     if (is_object($alias)) {
       $className = get_class($alias);
       if (array_key_exists($className, $this->_instanceMap)) {
-        return;
+        return $this->_instanceMap[$alias];
       }
       $this->_instanceMap[$className] = $alias;
-      return;
+      return $this->_instanceMap[$className];
     }
     if (is_object($object)) {
       if (empty($alias)) {
@@ -115,7 +117,7 @@ class Container {
         );
       }
       $this->_instanceMap[$alias] = $object;
-      return;
+      return $this->_instanceMap[$alias];
     }
     if (empty($alias) && empty($object)) {
       throw new HttpException(
@@ -124,6 +126,7 @@ class Container {
       );
     }
     $this->_instanceMap[$alias] = new $alias();
+    return $this->_instanceMap[$alias];
   }
 
   /**

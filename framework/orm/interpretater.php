@@ -10,8 +10,6 @@
  *************************************************/
 
 namespace Framework\Orm;
-use Framework\Exceptions\HttpException;
-
 
 /**
  * Class interpretater
@@ -22,53 +20,198 @@ use Framework\Exceptions\HttpException;
  * @VERSION
  * @AUTHOR  cavinHuang
  */
-class interpretater
+trait interpretater
 {
   /**
-   * 表名
+   * 表名称
+   *
+   * table name
+   *
    * @var string
    */
-  private $_tableName = '';
+  private $tableName = '';
 
   /**
-   * 当前实例
+   * 查询条件
    *
-   * @var null
+   * query where condition
+   *
+   * @var string
    */
-  private static $_instance = null;
+  private $where     = '';
 
   /**
-   * 设置表名
-   * @param string $table
-   * @author cavinHUang
-   * @date   2018/6/29 0029 下午 2:48
-   * @throws \Framework\Exceptions\HttpException
-   * @throws \Exception
+   * 查询参数
+   *
+   * query params
+   *
+   * @var string
    */
-  public static function table ($table = '')
+  public  $params    = '';
+
+  /**
+   * 排序条件
+   *
+   * sort condition
+   *
+   * @var string
+   */
+  private $orderBy   = '';
+
+  /**
+   * 查询限制
+   *
+   * query quantity limit
+   *
+   * @var string
+   */
+  private $limit     = '';
+
+  /**
+   * 查询偏移量
+   *
+   * query offset
+   *
+   * @var string
+   */
+  private $offset    = '';
+
+  /**
+   * 查询字段限制
+   *
+   * @var string
+   */
+  private $field = '*';
+
+  /**
+   * 表名称
+   *
+   * table name
+   *
+   * @var string
+   */
+  public $sql       = '';
+
+  /**
+   *  查找一条数据
+   *
+   * @return mixed
+   */
+  public function select($data=[])
   {
-    if (empty($table)) {
-      throw new HttpException( '400', 'table name is not exits.' );
-    }
-
-    if (is_null(self::$_instance) || !self::$_instance instanceof self) {
-      self::$_instance = new self();
-    }
-
-    // 更新实例表名
-    self::$_instance->_setTableName($table);
-    // 返回实例
-    return self::$_instance;
+    $this->sql = "SELECT {$this->field} FROM `{$this->tableName}`";
   }
 
   /**
-   * 设置表明
+   * 字段限制
    *
-   * @param string $table   表名
+   * @param string|array $field  字段限制
    * @author cavinHUang
-   * @date   2018/6/29 0029 下午 2:52
+   * @date   xxx
+   *
    */
-  public function _setTableName ($table = '') {
-    $this->_tableName = $table;
+  public function field ($field = '*') {
+    if (is_array($field)) {
+      $this->field = $this->buildField($field);
+    } else {
+      $this->field = $this->buildField(explode(',', $field));
+    }
+    return $this;
+  }
+
+  /**
+   * 组装字段
+   *
+   * @param array $fields 字段
+   * @author cavinHUang
+   * @date   2018/7/7 0007 上午 11:08
+   *
+   */
+  private function buildField ($fields = []) {
+    $fieldStr = '';
+
+    foreach ($fields as $v) {
+      $fieldStr .= "`{$v}`,";
+    }
+
+    return substr($fieldStr, 0, strlen($fieldStr) - 1);
+  }
+
+  /**
+   * where 条件
+   *
+   * @param string|array $data 第一个参数，可以是一个数组，一个字段名
+   * @param string $value 第二个参数，可以是一个查询值或者一个查询条件比如 >, =, <等
+   * @param string $pre 查询值
+   * @return $this|void
+   * @author cavinHUang
+   * @date   xxx
+   *
+   */
+  public function where($field = '', $value = '', $pre = '')
+  {
+    if (empty($field)) {
+      return;
+    }
+
+    $data = [];
+
+    if (is_string($field)) {
+      if (!empty($value)){
+        if (!empty($pre)) {
+          $data[$field] = [$value, $pre];
+        } else {
+          $data[$field] = $value;
+        }
+      }
+    } else {
+      $data = $field;
+    }
+
+    $count = count($data);
+
+    /* 单条件 */
+    if ($count === 1) {
+      $field = array_keys($data)[0];
+      $value = array_values($data)[0];
+      if (! is_array($value)){
+        $this->where  = " WHERE `{$field}` = :{$field}";
+        $this->params = $data;
+        return $this;
+      }
+      $this->where = " WHERE `{$field}` {$value[0]} :{$field}";
+      $this->params[$field] = $value[1];
+      return $this;
+    }
+    return $this;
+  }
+
+  /**
+   * order byd
+   *
+   * @param string $order
+   * @author cavinHUang
+   * @date   2018/7/7 0007 上午 11:00
+   *
+   */
+  public function order ($order = '') {
+    if (empty($order)) return;
+
+    $this->orderBy = ' ORDER BY '. $order;
+    return $this;
+  }
+
+  /**
+   * limit
+   *
+   * @author cavinHUang
+   * @date   2018/7/7 0007 上午 11:03
+   *
+   */
+  public function limit ($limit) {
+    if (empty($limit)) return;
+
+    $this->limit = ' LIMIT '. $limit;
+    return $this;
   }
 }
