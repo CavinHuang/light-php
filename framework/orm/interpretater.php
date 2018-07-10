@@ -478,4 +478,109 @@ trait interpretater
     $this->limit = ' LIMIT '. $limit;
     return $this;
   }
+
+  /**
+   * sum data
+   *
+   * @param string $field
+   * @return mixed
+   * @author cavinHUang
+   * @date   xxx
+   *
+   */
+  public function sum ($field = '*') {
+    $fieldStr = $this->packColumn('sum', $field);
+    $this->sql = "SELECT {$fieldStr} FROM {$this->tableName}";
+    $this->buildSql();
+    return $this->_dbInstance->fetchAll($this);
+  }
+
+  /**
+   * count field
+   *
+   * @param string $field
+   * @return mixed
+   * @author cavinHUang
+   * @date   2018/7/10 0010 下午 3:20
+   *
+   */
+  public function count ($field = '*') {
+    $fieldStr = $this->packColumn('count', $field);
+    $this->sql = "SELECT {$fieldStr} FROM {$this->tableName}";
+    $this->buildSql();
+    return $this->_dbInstance->fetchAll($this);
+  }
+
+  /**
+   * max field
+   *
+   * @param string $field
+   * @return mixed
+   * @author cavinHUang
+   * @date   xxx
+   *
+   */
+  public function max ($field = '*') {
+    $fieldStr = $this->packColumn('max', $field);
+    $this->sql = "SELECT {$fieldStr} FROM {$this->tableName}";
+    $this->buildSql();
+    return $this->_dbInstance->fetchAll($this);
+  }
+
+  /**
+   * min field
+   *
+   * @param string $field
+   * @return mixed
+   * @author cavinHUang
+   * @date   xxx
+   *
+   */
+  public function min ($field = '*') {
+    $fieldStr = $this->packColumn('min', $field);
+    $this->sql = "SELECT {$fieldStr} FROM {$this->tableName}";
+    $this->buildSql();
+    return $this->_dbInstance->fetchAll($this);
+  }
+
+  /**
+   * avg field
+   *
+   * @param string $field
+   * @return mixed
+   * @author cavinHUang
+   * @date   xxx
+   *
+   */
+  public function avg ($field = '*') {
+    $fieldStr = $this->packColumn('avg', $field);
+    $this->sql = "SELECT {$fieldStr} FROM {$this->tableName}";
+    $this->buildSql();
+    return $this->_dbInstance->fetchAll($this);
+  }
+
+  /**
+   * 组装mysql函数字段
+   *
+   * @param  string $functionName mysql函数名称
+   * @param  string $data         参数
+   * @return string
+   */
+  public function packColumn($functionName = '', $data = '')
+  {
+    $field     = "{$functionName}(`{$data}`)";
+    preg_match_all('/(\w+)\sas/', $data, $matchColumn);
+    if (isset($matchColumn[1][0]) || (! empty($matchColumn[1][0]))) {
+      $matchColumn = $matchColumn[1][0];
+      $field = "{$functionName}(`{$matchColumn}`)";
+      preg_match_all('/as\s(\w+)/', $data, $match);
+      if (isset($match[1][0]) || (! empty($match[1][0]))) {
+        $match = $match[1][0];
+        $field .= " as `{$match}`";
+      }
+    }
+
+    return $field;
+  }
+
 }

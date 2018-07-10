@@ -64,7 +64,7 @@ class Index {
     // $res = $instance->insert(['name' => 'cavinhuang', 'age' => 33]);
 
      // $isUpdate = $instance->where('age', '26')->update(['name' => 'light-php']);
-      $res = $instance->delete('33');
+      $res = $instance->avg('age as age');
 
      return ['result' => $res,  'lastId' => $instance, 'lastSql' => $instance->lastSql];
   }
