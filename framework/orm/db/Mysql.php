@@ -67,6 +67,11 @@ class Mysql {
    */
   private $dsn = '';
 
+  // 查询结果类型
+  protected $fetchType = PDO::FETCH_ASSOC;
+  // 字段属性大小写
+  protected $attrCase = PDO::CASE_LOWER;
+
   /**
    * Mysql constructor.
    */
@@ -107,7 +112,7 @@ class Mysql {
     $this->_pdoPreStatement = $this->_pdo->prepare($DB->sql);
     $this->bindValue($DB);
     $this->execute($DB);
-    return $this->_pdoPreStatement->fetch(PDO::FETCH_ASSOC);
+    return $this->_pdoPreStatement->fetch($this->fetchType);
   }
 
   /**
@@ -122,7 +127,7 @@ class Mysql {
     $this->_pdoPreStatement = $this->_pdo->prepare($DB->sql);
     $this->bindValue($DB);
     $this->execute($DB);
-    return $this->_pdoPreStatement->fetchAll(PDO::FETCH_ASSOC);
+    return $this->_pdoPreStatement->fetchAll($this->fetchType);
   }
 
   /**
@@ -137,6 +142,65 @@ class Mysql {
     $this->_pdoPreStatement->execute();
     $DB->lastSql = $DB->showQuery($this->_pdoPreStatement->queryString, $DB->params);
     $DB->clearParmas();
+  }
+
+  /**
+   * 取得数据表的字段信息
+   * @access public
+   * @param string $tableName
+   * @return array
+   */
+  public function getFields(DB $DB)
+  {
+    list($tableName) = explode(' ', $DB->tableName);
+    if (false === strpos($tableName, '`')) {
+      if (strpos($tableName, '.')) {
+        $tableName = str_replace('.', '`.`', $tableName);
+      }
+      $tableName = '`' . $tableName . '`';
+    }
+    $sql    = 'SHOW COLUMNS FROM ' . $tableName;
+    $this->_pdoPreStatement = $this->_pdo->prepare($sql);
+    $this->execute($DB);
+    $result = $this->_pdoPreStatement->fetchAll($this->fetchType);
+    $info   = [];
+    if ($result) {
+      foreach ($result as $key => $val) {
+        $val                 = array_change_key_case($val);
+        $info[$val['field']] = [
+          'name'    => $val['field'],
+          'type'    => $val['type'],
+          'notnull' => (bool) ('' === $val['null']), // not null is empty, null is yes
+          'default' => $val['default'],
+          'primary' => (strtolower($val['key']) == 'pri'),
+          'autoinc' => (strtolower($val['extra']) == 'auto_increment'),
+        ];
+      }
+    }
+    return $this->fieldCase($info);
+  }
+
+  /**
+   * 对返数据表字段信息进行大小写转换出来
+   * @access public
+   * @param array $info 字段信息
+   * @return array
+   */
+  public function fieldCase($info)
+  {
+    // 字段大小写转换
+    switch ($this->attrCase) {
+      case PDO::CASE_LOWER:
+        $info = array_change_key_case($info);
+        break;
+      case PDO::CASE_UPPER:
+        $info = array_change_key_case($info, CASE_UPPER);
+        break;
+      case PDO::CASE_NATURAL:
+      default:
+        // 不做转换
+    }
+    return $info;
   }
 
   /**
@@ -163,6 +227,19 @@ class Mysql {
    */
   public function update(DB $DB)
   {
+    $this->_pdoPreStatement = $this->_pdo->prepare($DB->sql);
+    $this->bindValue($DB);
+    return $this->execute($DB);
+  }
+
+  /**
+   * 删除
+   *
+   * @author cavinHUang
+   * @date   2018/7/9 0009 下午 4:06
+   *
+   */
+  public function delete (DB $DB) {
     $this->_pdoPreStatement = $this->_pdo->prepare($DB->sql);
     $this->bindValue($DB);
     return $this->execute($DB);

@@ -90,10 +90,14 @@ class DB {
    */
   public function init () {
     $config  = APP::$container->getSingle('config');
-    $this->_dbtype = $config->config['database']['type'];
+    $this->config = $config->config['database'];
+    $this->_dbtype = $this->config['type'];
     $this->decide();
 
-    // 清空条件，不影响本次查询
+    // 获取表信息
+    $this->info = $this->getTableInfo();
+
+    // 重置条件，不影响本次查询
     $this->clearParmas();
   }
 
@@ -120,63 +124,6 @@ class DB {
         return new $dbStrategyName();
       }
     );
-  }
-
-  /**
-   * 获取一条数据
-   * @return mixed
-   * @author cavinHUang
-   * @date   xxx
-   *
-   */
-  public function fetch() {
-    $this->select();
-    $this->buildSql();
-    $functionName = __FUNCTION__;
-    return $this->_dbInstance->$functionName($this);
-  }
-
-  /**
-   * 获取一条的别名
-   * @return mixed
-   * @author cavinHUang
-   * @date   2018/7/7 0007 上午 10:49
-   *
-   */
-  public function find(){
-    return $this->fetch();
-  }
-
-  /**
-   * 获取多条数据
-   * @return mixed
-   * @author cavinHUang
-   * @date   2018/7/7 0007 上午 10:50
-   *
-   */
-  public function fetchAll(){
-    $this->select();
-    $this->buildSql();
-    $functionName = __FUNCTION__;
-    return $this->_dbInstance->$functionName($this);
-  }
-
-  /**
-   * 构建sql语句
-   *
-   * @return void
-   */
-  public function buildSql()
-  {
-    if (! empty($this->where)) {
-      $this->sql .= $this->where;
-    }
-    if (! empty($this->orderBy)) {
-      $this->sql .= $this->orderBy;
-    }
-    if (! empty($this->limit)) {
-      $this->sql .= $this->limit;
-    }
   }
 
   /**
