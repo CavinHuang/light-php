@@ -51,6 +51,13 @@ class Request {
   public $requestParams = [];
 
   /**
+   * 请求参数
+   *
+   * @var array
+   */
+  private $envParams = [];
+
+  /**
    * http方法名称
    * @var string
    */
@@ -194,6 +201,30 @@ class Request {
   {
     if (isset($this->serverParams[$value])) {
       return $this->serverParams[$value];
+    }
+    return '';
+  }
+
+  /**
+   * 获取所有参数
+   *
+   * @return array
+   */
+  public function all()
+  {
+    return $this->requestParams;
+  }
+
+  /**
+   * 获取env参数
+   *
+   * @param  string $value 参数名
+   * @return mixed
+   */
+  public function env($value = '')
+  {
+    if (isset($this->envParams[$value])) {
+      return $this->envParams[$value];
     }
     return '';
   }

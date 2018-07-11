@@ -10,7 +10,6 @@
  *************************************************/
 
 use Framework\Handles\ErrorHandle;
-use Framework\Handles\ExceptionHandle;
 use Framework\Handles\RouteHandle;
 use Framework\Exceptions\HttpException;
 use Framework\Request;

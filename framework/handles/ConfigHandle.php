@@ -13,6 +13,7 @@ namespace Framework\Handles;
 
 
 use Framework\App;
+use Framework\Exceptions\HttpException;
 
 class ConfigHandle implements Handle {
   /**
@@ -66,7 +67,31 @@ class ConfigHandle implements Handle {
   {
     $this->app = $app;
     $app::$container->setSingle('config', $this);
-    $this->loadConfig();
+    $this->loadConfig($app);
+    $this->loadEnv($app);
+  }
+
+  /**
+   * 加载.env文件
+   * @param \Framework\App $app
+   * @throws \Framework\Exceptions\HttpException
+   * @author cavinHUang
+   * @date   2018/7/11 0011 下午 3:44
+   * @throws \Exception
+   */
+  public function loadEnv (App $app) {
+    $env_file = $app->rootPath .'/.env';
+    if (!file_exists($env_file)) {
+      throw new HttpException(404, '.env file is not exist.');
+    }
+    $envParmas = parse_ini_file($env_file, true);
+
+    if ($envParmas === false) {
+      throw new HttpException(400, '.env parse fail');
+    }
+
+    $request = $app::$container->getSingle('request');
+    $request->envParams = $envParmas;
   }
 
   /**
@@ -74,12 +99,12 @@ class ConfigHandle implements Handle {
    *
    * @return void
    */
-  public function loadConfig()
+  public function loadConfig(App $app)
   {
     // 加载默认配置
-    $config   = require(ROOT_PATH . '/framework/config/common.php');
+    $config   = require($app->rootPath . '/framework/config/common.php');
     // 加载默认数据库配置
-    $database = require(ROOT_PATH . '/framework/config/database.php');
+    $database = require($app->rootPath . '/framework/config/database.php');
 
     $this->config = array_merge($config, $database);
   }

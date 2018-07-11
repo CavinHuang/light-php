@@ -118,7 +118,9 @@ class App {
   {
     self::$container->setSingle('request', $request);
     foreach ($this->_handleList as $handle) {
-      $handle()->register($this);
+      $instance = $handle();
+      self::$container->setSingle(get_class($instance), $instance);
+      $instance->register($this);
     }
   }
 
