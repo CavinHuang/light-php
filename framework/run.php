@@ -18,6 +18,7 @@ use Framework\Response;
 use Framework\App;
 use Framework\Handles\ConfigHandle;
 use Framework\Handles\NosqlHandle;
+use Framework\Handles\ServiceHandel;
 
 define('ROOT_PATH', __DIR__ . '/..');
 
@@ -44,6 +45,10 @@ try {
 
   $app->load(function() {
     return new NosqlHandle();
+  });
+
+  $app->load(function () {
+    return new ServiceHandel();
   });
 
   $app->load(function(){

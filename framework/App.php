@@ -58,7 +58,7 @@ class App {
    *
    * @var string
    */
-  private $rootPath;
+  public $rootPath;
 
   /**
    * 服务容器
